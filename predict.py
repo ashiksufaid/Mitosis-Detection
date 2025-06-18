@@ -7,9 +7,10 @@ from config import device
 import numpy
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score
 
+model = Model()
 
 checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights.pth')
-model = Model()
+
 model.load_state_dict(torch.load(checkpoint_path, map_location=device))
 model.to(device)
 model.eval()
@@ -42,9 +43,9 @@ print(f"Accuracy: {accuracy:.2f}")
 # Confusion Matrix and Metrics
 cm = confusion_matrix(labels, predictions)
 print("\nConfusion Matrix:")
-print("\tPredicted: 0\tPredicted: 1")
-print(f"Actual: 0\t{cm[0,0]}\t\t{cm[0,1]}")
-print(f"Actual: 1\t{cm[1,0]}\t\t{cm[1,1]}")
+print(f"{'':<20}{'Predicted: Non-mitosis':<25}{'Predicted: Mitosis'}")
+print(f"{'Actual: Non-mitosis':<20}{cm[0,0]:<25}{cm[0,1]}")
+print(f"{'Actual: Mitosis':<20}{cm[1,0]:<25}{cm[1,1]}")
 
 precision = precision_score(labels, predictions)
 recall = recall_score(labels, predictions)
