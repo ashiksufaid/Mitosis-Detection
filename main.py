@@ -13,8 +13,6 @@ resnet.fc = nn.Linear(resnet.fc.in_features, num_classes)
 
 for param in resnet.parameters():
     param.requires_grad = False
-for param in resnet.layer2.parameters():
-    param.requires_grad = True
 for param in resnet.layer3.parameters():
     param.requires_grad = True
 for param in resnet.layer4.parameters():
