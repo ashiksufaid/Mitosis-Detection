@@ -11,7 +11,7 @@ model = models.resnet50(pretrained=True)
 num_classes = 1
 model.fc = nn.Linear(model.fc.in_features, num_classes)
 print(os.getcwd())
-checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights2.pth')
+checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights.pth')
 
 model.load_state_dict(torch.load(checkpoint_path, map_location=device))
 model.to(device)

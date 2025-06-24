@@ -39,7 +39,7 @@ def main():
     num_classes = 1
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     print(os.getcwd())
-    checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights2.pth')
+    checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights.pth')
 
     model.load_state_dict(torch.load(checkpoint_path, map_location=device))
     model.to(device)
@@ -65,7 +65,7 @@ def main():
     df.insert(0, "Row ID", df.index + 1)
 
     # 6. Save to CSV
-    df.to_csv("predictions2.csv", index=False)
+    df.to_csv("no_pretrain_resnet_pred.csv", index=False)
     print("Saved predictions to predictions.csv")
 
 if __name__ == "__main__":

@@ -4,11 +4,13 @@ import torch.optim as optim
 from tqdm import tqdm
 import os
 
-def train_model(model, num_epochs, train_loader, loss_fn, optimizer, device):
+def train_model(model, num_epochs, train_loader, val_loader, loss_fn, optimizer, device):
     model = model.to(device)
     optimizer = optimizer(model.parameters())
     epoch_losses = []
     epoch_accuracies = []
+    val_losses = []
+    val_accuracies = []
 
     for epoch in range(num_epochs):
         running_loss = 0.0
@@ -42,10 +44,34 @@ def train_model(model, num_epochs, train_loader, loss_fn, optimizer, device):
         epoch_losses.append(epoch_loss)
         epoch_accuracy = 100 * (correct/total) if total > 0 else 0
         epoch_accuracies.append(epoch_accuracy)
+        
+        model.eval()
+        val_running_loss = 0.0
+        corr = 0
+        total = 0
+        with torch.no_grad():
+            for inputs, targets in val_loader:
+                inputs = inputs.to(device)
+                targets = targets.to(device)
+                targets = targets.view(-1,1)
+                outputs = model(inputs)
+                loss = loss_fn(outputs, targets)
+                probs = torch.sigmoid(outputs)
+                preds =  (probs>0.5).float()
+                corr += (preds == targets).sum().item()
+                total += targets.size(0)
+                val_running_loss += loss.item() * targets.size(0)
+        val_loss = val_running_loss / len(val_loader.dataset)
+        val_accuracy = (corr/total)* 100 if total > 0 else 0
+        val_accuracies.append(val_accuracy)
+        val_losses.append(val_loss)
+
         print(f"Epoch [{epoch+1}/{num_epochs}], Loss: {epoch_loss:.4f}, Accuracy: {epoch_accuracy:.2f}%")
+        print(f"Epoch [{epoch+1}/{num_epochs}], Val Loss: {val_loss:.4f}, Val Acc: {val_accuracy:.2f}%")
     
     checkpoints_dir = os.path.join(os.getcwd(), "checkpoints")
-    checkpoint_path = os.path.join(checkpoints_dir, "model_weights3.pth")
+    os.makedirs(checkpoints_dir, exist_ok=True)
+    checkpoint_path = os.path.join(checkpoints_dir, "model_weights.pth")
     torch.save(model.state_dict(), checkpoint_path)
-    return epoch_losses
+    return epoch_losses, epoch_accuracies, val_losses, val_accuracies
 
