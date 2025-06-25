@@ -6,12 +6,12 @@ import torchvision.models as models
 import torch.nn as nn
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = models.resnet50(pretrained=True)
+model = models.resnet18(pretrained=False)
 
 num_classes = 1
 model.fc = nn.Linear(model.fc.in_features, num_classes)
 print(os.getcwd())
-checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights.pth')
+checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights_resnet18.pth')
 
 model.load_state_dict(torch.load(checkpoint_path, map_location=device))
 model.to(device)

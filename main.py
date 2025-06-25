@@ -7,8 +7,8 @@ from Dataset import GliomaDataset
 from torch.utils.data import DataLoader
 from train import train_model
 import matplotlib.pyplot as plt
-resnet = models.resnet50(pretrained=False)
-
+resnet = models.resnet18(pretrained=False)
+print(f"training {resnet}")
 num_classes = 1
 resnet.fc = nn.Linear(resnet.fc.in_features, num_classes)
 
@@ -25,7 +25,7 @@ val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
 criterion = nn.BCEWithLogitsLoss()
 optimizer = torch.optim.Adam
-epochs = 30
+epochs = 40
 device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
 resnet.train()
 train_loss, train_acc, val_loss, val_acc = train_model(resnet, epochs, train_loader, val_loader, criterion, optimizer, device)
@@ -67,6 +67,5 @@ def plot_loss_accuracy(train_loss, val_loss, train_acc, val_acc, epochs, save_pa
     plt.savefig(save_path)
     plt.close(fig)
 
-plot_loss_accuracy(train_loss, val_loss, train_acc, val_acc, epochs, save_path="training_result.png")
-
+plot_loss_accuracy(train_loss, val_loss, train_acc, val_acc, epochs, save_path="training_result_resnet18.png")
 

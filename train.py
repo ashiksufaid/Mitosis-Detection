@@ -71,7 +71,7 @@ def train_model(model, num_epochs, train_loader, val_loader, loss_fn, optimizer,
     
     checkpoints_dir = os.path.join(os.getcwd(), "checkpoints")
     os.makedirs(checkpoints_dir, exist_ok=True)
-    checkpoint_path = os.path.join(checkpoints_dir, "model_weights.pth")
+    checkpoint_path = os.path.join(checkpoints_dir, "model_weights_resnet18.pth")
     torch.save(model.state_dict(), checkpoint_path)
     return epoch_losses, epoch_accuracies, val_losses, val_accuracies
 
