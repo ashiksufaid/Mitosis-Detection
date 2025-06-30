@@ -39,9 +39,15 @@ class GliomaDataset(Dataset):
             with open(json_path, "r") as f:
                 data = json.load(f)
                 annotations = data["shapes"]
-        
+            json_image_height = data["imageHeight"]
+            json_image_width = data["imageWidth"]
+            image = Image.open(img_path).convert("RGB")
+            actual_height, actual_width = image.size
             for shape in annotations:
                 points = shape['points']
+                scale_x = actual_width/json_image_width
+                scale_y = actual_height/json_image_height
+                points = [(x * scale_x, y * scale_y) for x,y in points]
                 xmin, ymin = np.min(points, axis = 0)
                 xmax, ymax = np.max(points, axis = 0)
                 bbox = [xmin, ymin, xmax, ymax] 

@@ -44,10 +44,10 @@ labels = [float(l) for l in labels]
 
 dat = GliomaDataset(test_dir, aspect_change= False, transform = None)
 
-wrong_dir = "wrong_plots_raw"
+wrong_dir = "wrong_plots"
 os.makedirs(wrong_dir, exist_ok=True)
 for idx, (pred,label) in enumerate(zip(predictions, labels)):
-    if pred != label:
+    if pred == label:
         crop, _ = dat[idx]
         img_np = np.array(crop)
         plt.imshow(img_np)
