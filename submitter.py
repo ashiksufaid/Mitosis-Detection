@@ -34,19 +34,22 @@ def main():
 
     # 2. Load model
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = models.resnet18(pretrained=False)
+    model = models.resnet50(weights=None)
 
     num_classes = 1
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     print(os.getcwd())
-    checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights_resnet18.pth')
+    checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights_resnet50_ft.pth')
+    checkpoint = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    print("Best epoch:", checkpoint['epoch'])
+    print("Best val loss:", checkpoint['val_loss'])
 
-    model.load_state_dict(torch.load(checkpoint_path, map_location=device))
     model.to(device)
     model.eval()
 
     # 3. Prepare DataLoader
-    dataset = GliomaDataset(test_dir, do_aug=False)
+    dataset = GliomaDataset(test_dir, transform="test")
     loader = DataLoader(dataset, batch_size=32)
 
     # 4. Run inference and collect predictions
@@ -65,7 +68,7 @@ def main():
     df.insert(0, "Row ID", df.index + 1)
 
     # 6. Save to CSV
-    df.to_csv("no_pretrain_resnet18_pred.csv", index=False)
+    df.to_csv("no_pretrain_resnet50_ft_pred.csv", index=False)
     print("Saved predictions to predictions.csv")
 
 if __name__ == "__main__":

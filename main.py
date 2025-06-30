@@ -2,32 +2,38 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torchvision.models as models
+from torchvision.models import ResNet50_Weights
 import torchvision.transforms as transforms
 from Dataset import GliomaDataset
 from torch.utils.data import DataLoader
 from train import train_model
 import matplotlib.pyplot as plt
-resnet = models.resnet18(pretrained=False)
+resnet = models.resnet50(weights=ResNet50_Weights.DEFAULT)
 print(f"training {resnet}")
 num_classes = 1
 resnet.fc = nn.Linear(resnet.fc.in_features, num_classes)
 
 for param in resnet.parameters():
+    param.requires_grad = False
+for param in resnet.fc.parameters():
+    param.requires_grad = True
+for param in resnet.layer3.parameters():
+    param.requires_grad = True
+for param in resnet.layer4.parameters():
     param.requires_grad = True
 
 train_dir = "/home/ashiksufaid/summer proj 2/Data_122824/Glioma_MDC_2025_training"
-train_dataset = GliomaDataset(train_dir, do_aug=True)
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle = True)
+train_dataset = GliomaDataset(train_dir, transform="train")
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle = True)
 
 val_dir = "/home/ashiksufaid/summer proj 2/Data_122824/Glioma_MDC_2025_tester"
 val_dataset = GliomaDataset(val_dir, do_aug=False)
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
 criterion = nn.BCEWithLogitsLoss()
-optimizer = torch.optim.Adam
+optimizer = torch.optim.Adam(resnet.parameters())
 epochs = 40
-device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
-resnet.train()
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 train_loss, train_acc, val_loss, val_acc = train_model(resnet, epochs, train_loader, val_loader, criterion, optimizer, device)
 
 def plot_loss_accuracy(train_loss, val_loss, train_acc, val_acc, epochs, save_path="training_results.png"):
@@ -67,5 +73,5 @@ def plot_loss_accuracy(train_loss, val_loss, train_acc, val_acc, epochs, save_pa
     plt.savefig(save_path)
     plt.close(fig)
 
-plot_loss_accuracy(train_loss, val_loss, train_acc, val_acc, epochs, save_path="training_result_resnet18.png")
+plot_loss_accuracy(train_loss, val_loss, train_acc, val_acc, epochs, save_path="training_result_resnet50_ft.png")
 

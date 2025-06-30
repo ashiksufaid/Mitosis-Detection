@@ -6,19 +6,21 @@ import torchvision.models as models
 import torch.nn as nn
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, accuracy_score
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = models.resnet18(pretrained=False)
+model = models.resnet50(weights=None)
 
 num_classes = 1
 model.fc = nn.Linear(model.fc.in_features, num_classes)
 print(os.getcwd())
-checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights_resnet18.pth')
-
-model.load_state_dict(torch.load(checkpoint_path, map_location=device))
+checkpoint_path = os.path.join(os.getcwd(), 'checkpoints', 'model_weights_resnet50_ft.pth')
+checkpoint = torch.load(checkpoint_path, map_location=device)
+model.load_state_dict(checkpoint['model_state_dict'])
+print("Best epoch:", checkpoint['epoch'])
+print("Best val loss:", checkpoint['val_loss'])
 model.to(device)
 model.eval()
 
 test_dir = '/home/ashiksufaid/summer proj 2/Data_122824/Glioma_MDC_2025_tester'
-data = GliomaDataset(test_dir, do_aug=False)
+data = GliomaDataset(test_dir, transform="test")
 test_loader = DataLoader(data, batch_size=32)
 
 predictions = []

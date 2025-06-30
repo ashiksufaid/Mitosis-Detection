@@ -11,21 +11,22 @@ import numpy as np
 from PIL import Image, ImageOps
 
 class GliomaDataset(Dataset):
-    def __init__(self, root_dir, target_size=(48,48), do_aug = False):
+    def __init__(self, root_dir, target_size=(48,48), aspect_change = True, transform = None):
         self.root_dir = root_dir
         self.target_size = target_size
-        self.do_aug = do_aug
+        self.aspect_change = aspect_change
+        self.transform = transform
         self.train_transform = transforms.Compose([
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.RandomVerticalFlip(p=0.5),
             transforms.RandomRotation(degrees=15),
             transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.05),
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5])
+            transforms.Normalize(mean=[0.485, 0.456, 0.406] , std=[0.229, 0.224, 0.225])
         ])
         self.test_transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize(mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5])
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
             ])
             
         self.images = sorted([f for f in os.listdir(root_dir) if f.endswith("jpg")])
@@ -65,11 +66,13 @@ class GliomaDataset(Dataset):
         image = Image.open(img_path).convert("RGB")
         xmin, ymin, xmax, ymax = map(int, bbox)
         crop = image.crop((xmin, ymin, xmax, ymax))  # PIL crop: (left, upper, right, lower)
-        crop = self.aspect_ratio_resize_and_pad(crop)
-        if self.do_aug:
-            crop = self.train_transform(crop)
-        else:
+        if self.aspect_change:    
+            crop = self.aspect_ratio_resize_and_pad(crop)
+        if self.transform == 'test':
             crop = self.test_transform(crop)
+        elif self.transform == 'train':
+            crop = self.train_transform(crop)
+
         label_tensor = torch.tensor([label], dtype=torch.float32)
         return crop, label_tensor
         
