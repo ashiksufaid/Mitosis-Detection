@@ -27,7 +27,7 @@ train_dataset = GliomaDataset(train_dir, transform="train")
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle = True)
 
 val_dir = "/home/ashiksufaid/summer proj 2/Data_122824/Glioma_MDC_2025_tester"
-val_dataset = GliomaDataset(val_dir, do_aug=False)
+val_dataset = GliomaDataset(val_dir, transform="train")
 val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
 
 criterion = nn.BCEWithLogitsLoss()
