@@ -81,7 +81,35 @@ Implements the main training loop:
 
 - Calls train_model() from train.py to begin training
 
-###
+### 'predict.py' 
 
+Used to evaluate the trained model on a test dataset.
+
+Steps performed:
+
+- Loads the trained ResNet-50 checkpoint (model_weights2.pth).
+
+- Builds a test GliomaDataset and DataLoader.
+
+- Runs inference on all test images.
+
+- Computes classification metrics:
+
+    - Accuracy
+
+    - Precision
+
+    - Recall (Sensitivity)
+
+    - Specificity
+
+    - F1-score
+
+Displays a detailed confusion matrix:
+```yaml
+                    Predicted: Non-mitosis     Predicted: Mitosis
+Actual: Non-mitosis        TN                        FP
+Actual: Mitosis            FN                        TP
+```
 
 
