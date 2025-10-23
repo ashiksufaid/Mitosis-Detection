@@ -61,7 +61,7 @@ Implements the main training loop:
   ```bash
   checkpoints/model_weights.pth
   ```
-### 'main.py'
+### `main.py`
 
 - Loads a ResNet-50 backbone pretrained on ImageNet
 
@@ -81,7 +81,7 @@ Implements the main training loop:
 
 - Calls train_model() from train.py to begin training
 
-### 'predict.py' 
+### `predict.py`
 
 Used to evaluate the trained model on a test dataset.
 
